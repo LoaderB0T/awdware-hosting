@@ -15,9 +15,10 @@ services:
       - "./traefik.toml:/etc/traefik/traefik.toml"
     labels:
       - "traefik.enable=true"
-      - "traefik.frontend.rule=Host:admin.%%domain%%"
+      - "traefik.frontend.rule=Host:admin.localhost"
       - "traefik.frontend.entryPoints=https-admin"
-      - "traefik.http.routers.api.rule=Host(`admin.%%domain%%`)"
+      - "traefik.http.routers.api.rule=Host(`admin.localhost`)"
       - "traefik.http.routers.api.service=api@internal"
 
 %%projects%%
+%%volumes%%

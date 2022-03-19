@@ -1,19 +1,35 @@
 import * as fs from "fs";
-import path from "path";
+import path, { join } from "path";
+
+type CustomFile = {
+  from: string;
+  to: string;
+  isTraefikProvider?: boolean;
+};
 
 type Config = {
   domain: string;
   projects: Project[];
+  volumes?: string[];
+  customFiles?: CustomFile[];
 };
 
-type Project = {
+type Project = LocalProject | CustomProject;
+
+type LocalProject = {
+  type: "local";
   name: string;
   context: string;
   host: string;
 };
 
-const replacePlaceholders = (template: string, project: Project) => {
-  const placeHolders: (keyof Project)[] = ["name", "context", "host"];
+type CustomProject = {
+  type: "custom";
+  file: string;
+};
+
+const replacePlaceholders = (template: string, project: LocalProject) => {
+  const placeHolders: (keyof LocalProject)[] = ["name", "context", "host"];
   placeHolders.forEach((placeHolder) => {
     template = template.replace(
       new RegExp(`%%${placeHolder}%%`, "g"),
@@ -21,6 +37,12 @@ const replacePlaceholders = (template: string, project: Project) => {
     );
   });
   return template;
+};
+
+const customProject = (project: CustomProject) => {
+  const file = path.resolve(process.cwd(), project.file);
+  const content = fs.readFileSync(file, "utf8");
+  return indent(content, "  ");
 };
 
 const indent = (str: string, indentation: string = "  ") => {
@@ -41,18 +63,48 @@ const projectTemplate = indent(
 const config = JSON.parse(fs.readFileSync("./projects.json", "utf8")) as Config;
 
 const projects = config.projects;
-projects.forEach((p) => {
-  p.context = path.join("../", p.context);
-});
+projects
+  .filter((p) => p.type === "local")
+  .forEach((p) => {
+    const project = p as LocalProject;
+    project.context = path.join("../", project.context);
+  });
 
 template = template.replace(/%%domain%%/g, config.domain);
 
-const projectStrings = projects.map((project) =>
-  replacePlaceholders(projectTemplate, project)
-);
-const projectString = projectStrings.join("\n\n");
+const projectStrings = [
+  ...projects
+    .filter((p) => p.type === "local")
+    .map((project) =>
+      replacePlaceholders(projectTemplate, project as LocalProject)
+    ),
+  ...projects
+    .filter((p) => p.type === "custom")
+    .map((project) => customProject(project as CustomProject)),
+];
+const projectString = projectStrings.join("\n");
 
 template = template.replace(/%%projects%%/g, projectString);
 
+let volumeString = (config.volumes ?? [])
+  .map((v) => `${v}:\n  name: ${v}`)
+  .join("\n");
+if (volumeString) {
+  volumeString = `volumes:\n${indent(volumeString)}`;
+}
+template = template.replace(/%%volumes%%/g, volumeString);
+
 fs.writeFileSync("./output/docker-compose.yml", template);
 fs.copyFileSync("./templates/traefik.toml", "./output/traefik.toml");
+fs.copyFileSync("./templates/.env", "./output/.env");
+
+config.customFiles?.forEach((file) => {
+  fs.copyFileSync(file.from, path.join("./output", file.to));
+  if (file.isTraefikProvider) {
+    let traefikFile = fs.readFileSync("./output/traefik.toml", "utf8");
+    traefikFile =
+      traefikFile +
+      `\n[providers.file]\nfilename="${file.to.replace(/\\/g, "/")}"`;
+    fs.writeFileSync("./output/traefik.toml", traefikFile);
+  }
+});

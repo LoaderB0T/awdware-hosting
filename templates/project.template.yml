@@ -11,3 +11,4 @@
     - "traefik.http.routers.%%name%%_https.rule=Host(`%%host%%`)"
     - "traefik.http.routers.%%name%%_https.entrypoints=https"
     - "traefik.http.routers.%%name%%_https.tls=true"
+    - "traefik.http.routers.%%name%%_https.tls.certresolver=le"

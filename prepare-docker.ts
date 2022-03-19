@@ -3,8 +3,8 @@ import path, { join } from "path";
 
 type CustomFile = {
   from: string;
-  to: string;
-  isTraefikProvider?: boolean;
+  to?: string;
+  appendToTraefikConfig?: boolean;
 };
 
 type Config = {
@@ -99,12 +99,12 @@ fs.copyFileSync("./templates/traefik.toml", "./output/traefik.toml");
 fs.copyFileSync("./templates/.env", "./output/.env");
 
 config.customFiles?.forEach((file) => {
-  fs.copyFileSync(file.from, path.join("./output", file.to));
-  if (file.isTraefikProvider) {
-    let traefikFile = fs.readFileSync("./output/traefik.toml", "utf8");
-    traefikFile =
-      traefikFile +
-      `\n[providers.file]\nfilename="${file.to.replace(/\\/g, "/")}"`;
-    fs.writeFileSync("./output/traefik.toml", traefikFile);
+  if (file.to) {
+    fs.copyFileSync(file.from, path.join("./output", file.to));
+  }
+  if (file.appendToTraefikConfig) {
+    const traefikCnfig = fs.readFileSync("./output/traefik.toml", "utf8");
+    const content = fs.readFileSync(file.from, "utf8");
+    fs.writeFileSync("./output/traefik.toml", traefikCnfig + "\n" + content);
   }
 });

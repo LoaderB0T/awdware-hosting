@@ -22,3 +22,5 @@ dashboard = true
 [providers.docker]
 exposedByDefault = false
 network = "web"
+watch = true
+exposedbydefault = false

@@ -20,6 +20,7 @@ type LocalProject = {
   type: "local";
   name: string;
   context: string;
+  dockerfile?: string;
   host: string;
 };
 
@@ -33,9 +34,18 @@ const replacePlaceholders = (template: string, project: LocalProject) => {
   placeHolders.forEach((placeHolder) => {
     template = template.replace(
       new RegExp(`%%${placeHolder}%%`, "g"),
-      project[placeHolder]
+      project[placeHolder]!
     );
   });
+  const dockerFileRegExp = new RegExp(`%%dockerfile%%`, "g");
+  if (project.dockerfile) {
+    template = template.replace(
+      dockerFileRegExp,
+      `dockerfile: ${project.dockerfile}`
+    );
+  } else {
+    template = template.replace(dockerFileRegExp, "");
+  }
   return template;
 };
 

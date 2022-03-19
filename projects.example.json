@@ -1,0 +1,15 @@
+{
+  "domain": "example.com",
+  "projects": [
+    {
+      "name": "example_frontend",
+      "context": "../example/web",
+      "host": "example.com"
+    },
+    {
+      "name": "example_api",
+      "context": "../example/api",
+      "host": "api.example.com"
+    }
+  ]
+}

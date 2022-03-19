@@ -1,0 +1,24 @@
+# defaultEntryPoints must be at the top 
+# because it should not be in any table below
+defaultEntryPoints = ["http", "https"]
+
+[log]
+level = "DEBUG"
+
+# Entrypoints, http and https
+[entryPoints]
+
+# http should be redirected to https
+[entryPoints.http]
+address = ":80"
+
+# https is the default
+[entryPoints.https]
+address = ":443"
+
+[api]
+dashboard = true
+
+[providers.docker]
+exposedByDefault = false
+network = "web"

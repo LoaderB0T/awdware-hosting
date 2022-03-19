@@ -1,0 +1,7 @@
+%%name%%:
+  container_name: "%%name%%"
+  build:
+    context: %%context%%
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.%%name%%.rule=Host(`%%host%%`)"

@@ -1,5 +1,6 @@
 %%name%%:
   container_name: "%%name%%"
+  restart: unless-stopped
   build:
     context: %%context%%
     %%dockerfile%%

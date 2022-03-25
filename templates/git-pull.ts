@@ -1,10 +1,18 @@
 import { executeCmd } from "../execute-cmd.js";
 
+const configuration = process.argv[2];
+
 const gitPullInFolder = async (folder: string) => {
   const a = folder.split("/");
   let test = false;
   if (folder.includes("test")) {
     test = true;
+  }
+  if (
+    (configuration === "test" && !test) ||
+    (configuration === "prod" && test)
+  ) {
+    return;
   }
   const projectName = a[a.length - 1];
   return executeCmd(

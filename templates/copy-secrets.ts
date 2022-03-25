@@ -6,7 +6,7 @@ import { executeCmd } from "../execute-cmd.js";
 const configuration = process.argv[2];
 
 const main = async () => {
-  const config = JSON.parse(readFileSync("projects.json", "utf8"));
+  const config = JSON.parse(readFileSync("config.json", "utf8"));
   const globalSecretsPath = path.resolve(config.secretsPath);
   const secretsPath = path.resolve(
     path.join(config.secretsPath, configuration)

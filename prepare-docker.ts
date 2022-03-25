@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import path, { join } from "path";
+import path from "path";
 
 type CustomFile = {
   from: string;
@@ -8,7 +8,6 @@ type CustomFile = {
 };
 
 type Config = {
-  domain: string;
   name: string;
   projects: Project[];
   volumes?: string[];
@@ -82,7 +81,6 @@ projects
     project.context = path.join("../", project.context);
   });
 
-template = template.replace(/%%domain%%/g, config.domain);
 template = template.replace(/%%name%%/g, config.name);
 
 const projectStrings = [
@@ -103,7 +101,7 @@ let volumeString = (config.volumes ?? [])
   .map((v) => `${v}:\n  name: ${v}`)
   .join("\n");
 if (volumeString) {
-  volumeString = `volumes:\n${indent(volumeString)}`;
+  volumeString = `${indent(volumeString)}`;
 }
 template = template.replace(/%%volumes%%/g, volumeString);
 

@@ -14,6 +14,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - "./traefik.toml:/etc/traefik/traefik.toml"
+      - "acme-data:/acme-data/"
     labels:
       - "traefik.enable=true"
       - "traefik.frontend.rule=Host:admin.localhost"
@@ -22,4 +23,8 @@ services:
       - "traefik.http.routers.api.service=api@internal"
 
 %%projects%%
+
+volumes:
+  acme-data:
+    name: acme-data
 %%volumes%%

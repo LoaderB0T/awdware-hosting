@@ -10,7 +10,6 @@ const executeCmd = async (cmd: string, prefix: string, cwd?: string) => {
     });
     child.stderr?.on("data", (buffer: Buffer) => {
       console.error(prefix + buffer.toString());
-      exit(1);
     });
     child.stdout?.on("data", (buffer: Buffer) => {
       console.log(prefix + buffer.toString());

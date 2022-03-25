@@ -12,7 +12,6 @@ type MainConfig = {
 };
 
 type Config = {
-  name: string;
   projects: Project[];
   volumes?: string[];
   customFiles?: CustomFile[];
@@ -113,8 +112,6 @@ projects
     const project = p as LocalProject;
     project.context = path.join("../", project.context);
   });
-
-template = template.replace(/%%name%%/g, config.name);
 
 const projectStrings = [
   ...projects

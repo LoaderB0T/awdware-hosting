@@ -7,6 +7,10 @@ type CustomFile = {
   appendToTraefikConfig?: boolean;
 };
 
+type MainConfig = {
+  secretsPath: string;
+};
+
 type Config = {
   name: string;
   projects: Project[];
@@ -51,7 +55,12 @@ const replacePlaceholders = (template: string, project: LocalProject) => {
 };
 
 const customProject = (project: CustomProject) => {
-  const file = path.resolve(process.cwd(), project.file);
+  const file = path.resolve(
+    process.cwd(),
+    secretsPath,
+    "hosting",
+    project.file
+  );
   const content = fs.readFileSync(file, "utf8");
   return indent(content, "  ");
 };
@@ -71,7 +80,31 @@ const projectTemplate = indent(
   fs.readFileSync("./templates/project.template.yml", "utf8")
 );
 
-const config = JSON.parse(fs.readFileSync("./projects.json", "utf8")) as Config;
+const secretsPath = (
+  JSON.parse(fs.readFileSync("./config.json", "utf8")) as MainConfig
+).secretsPath;
+
+const projectJsonPath = path.resolve(
+  process.cwd(),
+  secretsPath,
+  "hosting/projects.json"
+);
+const projectTestJsonPath = path.resolve(
+  process.cwd(),
+  secretsPath,
+  "hosting/projects.test.json"
+);
+
+const config = JSON.parse(fs.readFileSync(projectJsonPath, "utf8")) as Config;
+const testConfig = JSON.parse(
+  fs.readFileSync(projectTestJsonPath, "utf8")
+) as Config;
+
+config.customFiles ??= [];
+config.customFiles.push(...(testConfig.customFiles ?? []));
+config.projects.push(...testConfig.projects);
+config.volumes ??= [];
+config.volumes.push(...(testConfig.volumes ?? []));
 
 const projects = config.projects;
 projects
@@ -110,12 +143,14 @@ fs.copyFileSync("./templates/traefik.toml", "./output/traefik.toml");
 fs.copyFileSync("./templates/.env", "./output/.env");
 
 config.customFiles?.forEach((file) => {
+  const from = path.resolve(process.cwd(), secretsPath, "hosting", file.from);
+
   if (file.to) {
-    fs.copyFileSync(file.from, path.join("./output", file.to));
+    fs.copyFileSync(from, path.join("./output", file.to));
   }
   if (file.appendToTraefikConfig) {
     const traefikCnfig = fs.readFileSync("./output/traefik.toml", "utf8");
-    const content = fs.readFileSync(file.from, "utf8");
+    const content = fs.readFileSync(from, "utf8");
     fs.writeFileSync("./output/traefik.toml", traefikCnfig + "\n" + content);
   }
 });
@@ -135,3 +170,5 @@ gitPullTemplate = gitPullTemplate
   .replace(/%%PROJECTS%%/g, projectPaths.join('", "'))
   .replaceAll("\\", "/");
 fs.writeFileSync("./output/git-pull.ts", gitPullTemplate);
+
+fs.copyFileSync("./templates/copy-secrets.ts", "./output/copy-secrets.ts");

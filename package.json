@@ -8,7 +8,10 @@
   "scripts": {
     "generate": "yarn ts-node --esm ./prepare-docker.ts",
     "pull": "yarn ts-node --esm ./output/git-pull.ts",
-    "docker": "docker compose -f ./output/docker-compose.yml up -d --force-recreate"
+    "secrets": "yarn ts-node --esm ./output/copy-secrets.ts",
+    "docker": "docker compose -f ./output/docker-compose.yml up -d --force-recreate",
+    "deploy-test": "yarn pull test && yarn generate && yarn secrets test && yarn docker",
+    "deploy-prod": "yarn pull prod && yarn generate && yarn secrets prod && yarn docker"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",

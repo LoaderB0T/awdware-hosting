@@ -22,6 +22,7 @@ type LocalProject = {
   context: string;
   dockerfile?: string;
   host: string;
+  root: string;
 };
 
 type CustomProject = {
@@ -118,3 +119,19 @@ config.customFiles?.forEach((file) => {
     fs.writeFileSync("./output/traefik.toml", traefikCnfig + "\n" + content);
   }
 });
+
+const projectPaths: string[] = [];
+projects.forEach((p) => {
+  if (p.type === "local") {
+    let newPath = p.root;
+    newPath = path.resolve(process.cwd(), newPath);
+    if (!projectPaths.includes(newPath)) {
+      projectPaths.push(newPath);
+    }
+  }
+});
+let gitPullTemplate = fs.readFileSync("./templates/git-pull.ts", "utf8");
+gitPullTemplate = gitPullTemplate
+  .replace(/%%PROJECTS%%/g, projectPaths.join('", "'))
+  .replaceAll("\\", "/");
+fs.writeFileSync("./output/git-pull.ts", gitPullTemplate);

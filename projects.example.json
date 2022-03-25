@@ -2,13 +2,18 @@
   "domain": "example.com",
   "projects": [
     {
+      "type": "local",
       "name": "example_frontend",
       "context": "../example/web",
+      "root": "../example",
       "host": "example.com"
     },
     {
+      "type": "local",
       "name": "example_api",
       "context": "../example/api",
+      "root": "../example",
+      "dockerfile": "src/Dockerfile",
       "host": "api.example.com"
     }
   ]

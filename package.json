@@ -6,11 +6,14 @@
   "author": "Janik Schumacher <rndmb0t@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "generate": "yarn ts-node --esm ./prepare-docker.ts"
+    "generate": "yarn ts-node --esm ./prepare-docker.ts",
+    "pull": "yarn ts-node --esm ./output/git-pull.ts",
+    "docker": "docker compose -f ./output/docker-compose.yml up -d --force-recreate"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.2"
-  }
+  },
+  "dependencies": {}
 }

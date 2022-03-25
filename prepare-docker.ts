@@ -9,6 +9,7 @@ type CustomFile = {
 
 type Config = {
   domain: string;
+  name: string;
   projects: Project[];
   volumes?: string[];
   customFiles?: CustomFile[];
@@ -82,6 +83,7 @@ projects
   });
 
 template = template.replace(/%%domain%%/g, config.domain);
+template = template.replace(/%%name%%/g, config.name);
 
 const projectStrings = [
   ...projects

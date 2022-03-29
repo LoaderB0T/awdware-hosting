@@ -4,5 +4,4 @@
   build:
     context: %%context%%
     %%dockerfile%%
-  labels:
 %%labels%%

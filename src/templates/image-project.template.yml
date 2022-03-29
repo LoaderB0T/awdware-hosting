@@ -3,5 +3,4 @@
   restart: unless-stopped
   image: %%image%%
   %%volumes%%
-  labels:
 %%labels%%

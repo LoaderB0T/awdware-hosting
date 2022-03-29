@@ -5,6 +5,7 @@ export type LocalProject = {
   dockerfile?: string;
   host: string;
   root: string;
+  volumes?: string[];
   port?: number;
 };
 

@@ -1,12 +1,12 @@
-import { readFileSync } from 'fs';
 import path from 'path';
 import { exit } from 'process';
 import { executeCmd } from '../util/execute-cmd.js';
+import { readFileSync } from '../util/read-file-sync.js';
 
 const configuration = process.argv[2];
 
 const main = async () => {
-  const config = JSON.parse(readFileSync('config.json', 'utf8'));
+  const config = JSON.parse(readFileSync('config.json'));
   const globalSecretsPath = path.resolve(config.secretsPath);
   const secretsPath = path.resolve(path.join(config.secretsPath, configuration));
   console.log(secretsPath);

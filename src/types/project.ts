@@ -16,7 +16,7 @@ export type CustomProject = {
 export type ImageProject = {
   type: 'image';
   name: string;
-  host: string;
+  host?: string;
   image: string;
   volumes?: string[];
   port?: number;

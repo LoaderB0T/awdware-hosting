@@ -4,4 +4,4 @@
   image: %%image%%
   %%volumes%%
   labels:
-    %%labels%%
+%%labels%%

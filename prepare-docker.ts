@@ -17,7 +17,7 @@ type Config = {
   customFiles?: CustomFile[];
 };
 
-type Project = LocalProject | CustomProject;
+type Project = LocalProject | CustomProject | ImageProject;
 
 type LocalProject = {
   type: "local";
@@ -31,6 +31,15 @@ type LocalProject = {
 type CustomProject = {
   type: "custom";
   file: string;
+};
+
+type ImageProject = {
+  type: "image";
+  name: string;
+  host: string;
+  image: string;
+  volumes?: string[];
+  ports?: string[];
 };
 
 const replacePlaceholders = (template: string, project: LocalProject) => {
@@ -64,6 +73,25 @@ const customProject = (project: CustomProject) => {
   return indent(content, "  ");
 };
 
+const imageProject = (template: string, project: ImageProject) => {
+  template = template.replaceAll("%%name%%", project.name);
+  template = template.replaceAll("%%host%%", project.host);
+  template = template.replaceAll("%%image%%", project.image);
+  let volumes = "";
+  if (project.volumes?.length) {
+    volumes = `volumes:${project.volumes
+      .map((v) => `\n      - ${v}`)
+      .join("")}`;
+  }
+  template = template.replace("%%volumes%%", volumes);
+  let ports = "";
+  if (project.ports?.length) {
+    ports = `ports:${project.ports.map((v) => `\n      - ${v}`).join("")}`;
+  }
+  template = template.replace("%%ports%%", ports);
+  return template;
+};
+
 const indent = (str: string, indentation: string = "  ") => {
   return str
     .split("\n")
@@ -77,6 +105,9 @@ let template = fs.readFileSync(
 );
 const projectTemplate = indent(
   fs.readFileSync("./templates/project.template.yml", "utf8")
+);
+const imageProjectTemplate = indent(
+  fs.readFileSync("./templates/image-project.template.yml", "utf8")
 );
 
 const secretsPath = (
@@ -118,6 +149,11 @@ const projectStrings = [
     .filter((p) => p.type === "local")
     .map((project) =>
       replacePlaceholders(projectTemplate, project as LocalProject)
+    ),
+  ...projects
+    .filter((p) => p.type === "image")
+    .map((project) =>
+      imageProject(imageProjectTemplate, project as ImageProject)
     ),
   ...projects
     .filter((p) => p.type === "custom")

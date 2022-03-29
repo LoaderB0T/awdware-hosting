@@ -15,7 +15,7 @@ const gitPullInFolder = async (folder: string) => {
   return executeCmd('git pull', `[${projectName}${test ? ' (test)' : ''}] `, folder);
 };
 
-const projects = ['%%PROJECTS%%'];
+const projects = ['%%projects%%'];
 
 const main = async () => {
   console.log();

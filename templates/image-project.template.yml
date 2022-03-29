@@ -3,8 +3,8 @@
   restart: unless-stopped
   image: %%image%%
   %%volumes%%
-  %%ports%%
   labels:
+    %%port%%
     - "traefik.enable=true"
     - "traefik.http.routers.%%name%%.rule=Host(`%%host%%`)"
     - "traefik.http.routers.%%name%%.entrypoints=http"

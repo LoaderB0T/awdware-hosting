@@ -39,7 +39,7 @@ type ImageProject = {
   host: string;
   image: string;
   volumes?: string[];
-  ports?: string[];
+  port?: number;
 };
 
 const replacePlaceholders = (template: string, project: LocalProject) => {
@@ -84,11 +84,11 @@ const imageProject = (template: string, project: ImageProject) => {
       .join("")}`;
   }
   template = template.replace("%%volumes%%", volumes);
-  let ports = "";
-  if (project.ports?.length) {
-    ports = `ports:${project.ports.map((v) => `\n      - ${v}`).join("")}`;
+  let port = "";
+  if (project.port) {
+    port = `- "traefik.port=${project.port}"`;
   }
-  template = template.replace("%%ports%%", ports);
+  template = template.replace("%%port%%", port);
   return template;
 };
 

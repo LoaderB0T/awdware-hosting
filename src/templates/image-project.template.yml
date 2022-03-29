@@ -1,0 +1,7 @@
+%%name%%:
+  container_name: "%%name%%"
+  restart: unless-stopped
+  image: %%image%%
+  %%volumes%%
+  labels:
+    %%labels%%

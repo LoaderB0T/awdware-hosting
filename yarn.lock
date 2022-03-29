@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@awdware/prettier-config@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@awdware/prettier-config/-/prettier-config-0.0.2.tgz#8fd6d59a2b78006cd93a4ae435ca1338382735e6"
+  integrity sha512-VK6SiTmFgiN27sMCOQesu70LgjBCW79FnIQrDzOF+8iZ6p6E/cJs7RPicUpSw+YnzBeRQvHIeC4pBJ//iYKnlA==
+
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-consumer/-/source-map-consumer-0.8.0.tgz#33bf4b7b39c178821606f669bbc447a6a629786b"

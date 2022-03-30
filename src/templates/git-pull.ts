@@ -1,4 +1,4 @@
-import { executeCmd } from '../util/execute-cmd.js';
+import { executeCmd } from '../src/util/execute-cmd.js';
 
 const configuration = process.argv[2];
 

@@ -93,7 +93,7 @@ export class Main {
       }
     });
     let gitPullTemplate = readFileSync('./src/templates/git-pull.ts');
-    return replacePlaceholders(gitPullTemplate, { projects: () => projectPaths.join('", "').replaceAll('\\', '/') });
+    return replacePlaceholders(gitPullTemplate, { projects: () => projectPaths.join("', '").replaceAll('\\', '/') });
   }
 
   private getLabels(project: LocalProject | ImageProject) {

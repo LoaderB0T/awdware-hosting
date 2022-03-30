@@ -7,6 +7,7 @@ export type LocalProject = {
   root: string;
   volumes?: string[];
   port?: number;
+  env?: string[];
 };
 
 export type CustomProject = {
@@ -21,6 +22,7 @@ export type ImageProject = {
   image: string;
   volumes?: string[];
   port?: number;
+  env?: string[];
 };
 
 export type Project = LocalProject | CustomProject | ImageProject;

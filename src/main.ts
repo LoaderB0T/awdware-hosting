@@ -115,6 +115,13 @@ export class Main {
     const volumesValueString = project.volumes.map(v => `- ${v}`).join('\n');
     return `volumes:\n${indent(volumesValueString, 2)}`;
   }
+  private getEnv(project: LocalProject | ImageProject) {
+    if (!project.env) {
+      return '';
+    }
+    const environmentsString = project.env.map(e => `- ${e}`).join('\n');
+    return `environments:\n${indent(environmentsString, 2)}`;
+  }
 
   private localProject(project: LocalProject) {
     return replacePlaceholders(projectTemplate, {
@@ -122,7 +129,8 @@ export class Main {
       context: () => path.join('../', project.context).replaceAll('\\', '/'), // so that the relative path matches the original relative path
       dockerfile: () => (project.dockerfile ? `dockerfile: ${project.dockerfile}` : undefined),
       volumes: () => this.getVolumes(project),
-      labels: () => this.getLabels(project)
+      labels: () => this.getLabels(project),
+      env: () => this.getEnv(project)
     });
   }
 
@@ -131,7 +139,8 @@ export class Main {
       name: () => project.name,
       image: () => project.image,
       volumes: () => this.getVolumes(project),
-      labels: () => this.getLabels(project)
+      labels: () => this.getLabels(project),
+      env: () => this.getEnv(project)
     });
   }
 

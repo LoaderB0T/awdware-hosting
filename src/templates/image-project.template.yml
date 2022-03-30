@@ -3,4 +3,5 @@
   restart: unless-stopped
   image: %%image%%
   %%volumes%%
+  %%env%%
 %%labels%%

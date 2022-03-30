@@ -1,7 +1,7 @@
 import path from 'path';
 import { exit } from 'process';
-import { executeCmd } from '../util/execute-cmd.js';
-import { readFileSync } from '../util/read-file-sync.js';
+import { executeCmd } from '../src/util/execute-cmd.js';
+import { readFileSync } from '../src/util/read-file-sync.js';
 
 const configuration = process.argv[2];
 

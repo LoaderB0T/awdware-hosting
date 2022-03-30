@@ -120,7 +120,7 @@ export class Main {
       return '';
     }
     const environmentsString = project.env.map(e => `- ${e}`).join('\n');
-    return `environments:\n${indent(environmentsString, 2)}`;
+    return `environment:\n${indent(environmentsString, 2)}`;
   }
 
   private localProject(project: LocalProject) {

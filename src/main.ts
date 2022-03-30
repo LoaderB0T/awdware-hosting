@@ -2,16 +2,22 @@ import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { config, mainConfig } from './data/configs.js';
 import { dockerComposeTemplate, imageProjectTemplate, projectTemplate, traefikTemplate } from './data/templates.js';
+import { Config } from './types/config.js';
 import { CustomProject, ImageProject, LocalProject } from './types/project.js';
+import { Target } from './types/target.js';
 import { indent } from './util/indent.js';
 import { readFileSync } from './util/read-file-sync.js';
 import { removeEmptyLines } from './util/remove-empty-lines.js';
 import { replacePlaceholders } from './util/replace-placeholders.js';
-const projects = config.projects;
 
 export class Main {
   private _template: string;
-  constructor() {
+  private _target?: Target;
+  private _config: Config;
+
+  constructor(target?: Target) {
+    this._target = target;
+    this._config = config(this._target);
     this._template = dockerComposeTemplate;
   }
 
@@ -32,7 +38,7 @@ export class Main {
   }
 
   private renderDockerComposeFile() {
-    const projectStrings = projects
+    const projectStrings = this._config.projects
       .map(p => {
         switch (p.type) {
           case 'local':
@@ -50,10 +56,10 @@ export class Main {
     const template = replacePlaceholders(this._template, {
       projects: () => projectString,
       volumes: () => {
-        if (!config.volumes) {
+        if (!this._config.volumes) {
           return '';
         }
-        const volumeString = config.volumes.map(v => `${v}:\n  name: ${v}`).join('\n');
+        const volumeString = this._config.volumes.map(v => `${v}:\n  name: ${v}`).join('\n');
         return indent(volumeString);
       }
     });
@@ -61,7 +67,7 @@ export class Main {
   }
 
   private handleCustomFiles() {
-    config.customFiles?.forEach(file => {
+    this._config.customFiles?.forEach(file => {
       const from = path.resolve(process.cwd(), mainConfig.secretsPath, 'hosting', file.from);
 
       if (file.to) {
@@ -77,7 +83,7 @@ export class Main {
 
   private renderGitPullFile() {
     const projectPaths: string[] = [];
-    projects.forEach(p => {
+    this._config.projects.forEach(p => {
       if (p.type === 'local') {
         let newPath = p.root;
         newPath = path.resolve(process.cwd(), newPath);

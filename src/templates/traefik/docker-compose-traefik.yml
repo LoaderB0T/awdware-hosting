@@ -1,0 +1,27 @@
+version: '3.3'
+
+services:
+  reverse-proxy:
+    container_name: 'reverse-proxy'
+    image: traefik:v2.6.1
+    command:
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - './traefik.toml:/etc/traefik/traefik.toml'
+      - 'acme-data:/acme-data/'
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.frontend.rule=Host:admin.localhost'
+      - 'traefik.frontend.entryPoints=https-admin'
+      - 'traefik.http.routers.api.rule=Host(`admin.localhost`)'
+      - 'traefik.http.routers.api.service=api@internal'
+
+volumes:
+  acme-data:
+    name: acme-data

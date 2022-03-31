@@ -1,10 +1,15 @@
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import path from 'path';
 import { config, mainConfig } from './data/configs.js';
-import { dockerComposeTemplate, imageProjectTemplate, projectTemplate, traefikTemplate } from './data/templates.js';
+import {
+  dockerComposeTemplate,
+  dockerComposeTraefikTemplate,
+  imageProjectTemplate,
+  projectTemplate,
+  traefikTemplate
+} from './data/templates.js';
 import { Config } from './types/config.js';
 import { CustomProject, ImageProject, LocalProject } from './types/project.js';
-import { Target } from './types/target.js';
 import { indent } from './util/indent.js';
 import { readFileSync } from './util/read-file-sync.js';
 import { removeEmptyLines } from './util/remove-empty-lines.js';
@@ -12,23 +17,45 @@ import { replacePlaceholders } from './util/replace-placeholders.js';
 
 export class Main {
   private _template: string;
-  private _target?: Target;
+  private _target?: string;
   private _config: Config;
+  private _outDirBase: string;
+  private _outDir: string;
+  private _outDirTraefik: string;
 
-  constructor(target?: Target) {
+  constructor(target: string) {
     this._target = target;
+    this._outDirBase = './output';
+    this._outDir = `${this._outDirBase}/${target}`;
+    this._outDirTraefik = `${this._outDirBase}/proxy`;
     this._config = config(this._target);
     this._template = dockerComposeTemplate;
   }
 
   public main() {
-    const dockerComposeFile = this.renderDockerComposeFile();
-    if (!existsSync('./output')) {
-      mkdirSync('./output');
+    if (!existsSync(this._outDirBase)) {
+      mkdirSync(this._outDirBase);
     }
-    writeFileSync('./output/docker-compose.yml', dockerComposeFile);
-    copyFileSync('./src/templates/traefik.toml', './output/traefik.toml');
-    copyFileSync('./src/templates/.env', './output/.env');
+    this.createTraefikOutput();
+    this.createTargetOutput();
+  }
+
+  private createTraefikOutput() {
+    if (!existsSync(this._outDirTraefik)) {
+      mkdirSync(this._outDirTraefik);
+    }
+    writeFileSync(`${this._outDirTraefik}/docker-compose.yml`, dockerComposeTraefikTemplate);
+    copyFileSync('./src/templates/traefik/traefik.toml', `${this._outDirTraefik}/traefik.toml`);
+    copyFileSync('./src/templates/.env', `${this._outDirTraefik}/.env`);
+  }
+
+  private createTargetOutput() {
+    const dockerComposeFile = this.renderDockerComposeFile();
+    if (!existsSync(this._outDir)) {
+      mkdirSync(this._outDir);
+    }
+    writeFileSync(`${this._outDir}/docker-compose.yml`, dockerComposeFile);
+    copyFileSync('./src/templates/.env', `${this._outDir}/.env`);
     this.handleCustomFiles();
 
     const gitPullFile = this.renderGitPullFile();
@@ -71,12 +98,12 @@ export class Main {
       const from = path.resolve(process.cwd(), mainConfig.secretsPath, 'hosting', file.from);
 
       if (file.to) {
-        copyFileSync(from, path.join('./output', file.to));
+        copyFileSync(from, path.join(`${this._outDir}`, file.to));
       }
       if (file.appendToTraefikConfig) {
-        const traefikCnfig = readFileSync('./output/traefik.toml');
+        const traefikCnfig = readFileSync(`${this._outDirTraefik}/traefik.toml`);
         const content = readFileSync(from);
-        writeFileSync('./output/traefik.toml', traefikCnfig + '\n' + content);
+        writeFileSync(`${this._outDirTraefik}/traefik.toml`, traefikCnfig + '\n' + content);
       }
     });
   }
@@ -126,7 +153,7 @@ export class Main {
   private localProject(project: LocalProject) {
     return replacePlaceholders(projectTemplate, {
       name: () => project.name,
-      context: () => path.join('../', project.context).replaceAll('\\', '/'), // so that the relative path matches the original relative path
+      context: () => path.join('../../', project.context).replaceAll('\\', '/'), // so that the relative path matches the original relative path
       dockerfile: () => (project.dockerfile ? `dockerfile: ${project.dockerfile}` : undefined),
       volumes: () => this.getVolumes(project),
       labels: () => this.getLabels(project),

@@ -3,6 +3,7 @@ version: '3.3'
 services:
   reverse-proxy:
     container_name: 'reverse-proxy'
+    restart: unless-stopped
     image: traefik:v2.6.1
     command:
       - --api.insecure=true

@@ -13,8 +13,8 @@
     "docker-build-prod": "cd output/prod && docker compose build",
     "docker-build-test": "cd output/test && docker compose build",
     "build-proxy": "cd output/proxy && docker compose build",
-    "build-prod": "yarn pull prod && yarn generate && yarn secrets prod && yarn docker-build-prod",
-    "build-test": "yarn pull test && yarn generate && yarn secrets test && yarn docker-build-test",
+    "build-prod": "yarn generate -t prod && yarn pull prod && yarn secrets prod && yarn docker-build-prod",
+    "build-test": "yarn generate -t test && yarn pull test && yarn secrets test && yarn docker-build-test",
     "start-prod": "cd output/prod && docker compose up -d --force-recreate",
     "start-test": "cd output/test && docker compose up -d --force-recreate",
     "start-proxy": "cd output/proxy && docker compose up -d --force-recreate"

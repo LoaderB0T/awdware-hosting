@@ -99,7 +99,7 @@ export class Main {
 
       if (file.to) {
         //ensure directory exists
-        const to = path.join(this._outDir, file.to);
+        const to = path.join(process.cwd(), this._outDir, file.to);
         const toDir = path.dirname(to);
         if (!existsSync(toDir)) {
           mkdirSync(toDir, { recursive: true });

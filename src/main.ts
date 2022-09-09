@@ -9,7 +9,7 @@ import {
   traefikTemplate
 } from './data/templates.js';
 import { Config } from './types/config.js';
-import { CustomProject, ImageProject, LocalProject } from './types/project.js';
+import { AdditionalProperties, CustomProject, ImageProject, LocalProject } from './types/project.js';
 import { indent } from './util/indent.js';
 import { readFileSync } from './util/read-file-sync.js';
 import { removeEmptyLines } from './util/remove-empty-lines.js';
@@ -150,12 +150,44 @@ export class Main {
     return `environment:\n${indent(environmentsString, 2)}`;
   }
 
+  private getAdditionalProperties(project: LocalProject | ImageProject) {
+    if (!project.additionalProperties) {
+      return '';
+    }
+    return indent(this.recurseAdditionalProperties(project.additionalProperties));
+  }
+
+  private recurseAdditionalProperties(additionalProperties: AdditionalProperties) {
+    let result = '';
+    Object.keys(additionalProperties).forEach(key => {
+      const value = additionalProperties[key];
+      if (typeof value === 'object') {
+        if (Array.isArray(value)) {
+          result += `${key}:\n${indent(value.map(v => `- ${v}`).join('\n'), 1)}`;
+        } else {
+          result += `${key}:\n${indent(this.recurseAdditionalProperties(value), 1)}`;
+        }
+      } else {
+        result += `${key}: ${value}\n`;
+      }
+    });
+    return result;
+  }
+
   private getPort(project: LocalProject | ImageProject) {
     if (!project.port || project.host) {
       return '';
     }
     const portString = `- ${project.port}:${project.port}`;
     return `ports:\n${indent(portString, 2)}`;
+  }
+
+  private getDependsOn(project: LocalProject | ImageProject) {
+    if (!project.dependsOn) {
+      return '';
+    }
+    const portString = project.dependsOn.map(d => `- ${d}`).join('\n');
+    return `depends_on:\n${indent(portString, 2)}`;
   }
 
   private localProject(project: LocalProject) {
@@ -165,7 +197,9 @@ export class Main {
       dockerfile: () => (project.dockerfile ? `dockerfile: ${project.dockerfile}` : undefined),
       volumes: () => this.getVolumes(project),
       labels: () => this.getLabels(project),
-      env: () => this.getEnv(project)
+      env: () => this.getEnv(project),
+      additionalProperties: () => this.getAdditionalProperties(project),
+      dependsOn: () => this.getDependsOn(project)
     });
   }
 
@@ -176,7 +210,9 @@ export class Main {
       volumes: () => this.getVolumes(project),
       labels: () => this.getLabels(project),
       env: () => this.getEnv(project),
-      port: () => this.getPort(project)
+      port: () => this.getPort(project),
+      additionalProperties: () => this.getAdditionalProperties(project),
+      dependsOn: () => this.getDependsOn(project)
     });
   }
 

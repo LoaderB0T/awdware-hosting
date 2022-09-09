@@ -8,6 +8,8 @@ export type LocalProject = {
   volumes?: string[];
   port?: number;
   env?: string[];
+  additionalProperties?: AdditionalProperties;
+  dependsOn?: string[];
 };
 
 export type CustomProject = {
@@ -23,6 +25,10 @@ export type ImageProject = {
   volumes?: string[];
   port?: number;
   env?: string[];
+  additionalProperties?: AdditionalProperties;
+  dependsOn?: string[];
 };
+
+export type AdditionalProperties = { [key: string]: string | string[] | AdditionalProperties };
 
 export type Project = LocalProject | CustomProject | ImageProject;

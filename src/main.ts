@@ -150,6 +150,14 @@ export class Main {
     return `environment:\n${indent(environmentsString, 2)}`;
   }
 
+  private getPort(project: LocalProject | ImageProject) {
+    if (!project.port || project.host) {
+      return '';
+    }
+    const portString = `- ${project.port}:${project.port}`;
+    return `ports:\n${indent(portString, 2)}`;
+  }
+
   private localProject(project: LocalProject) {
     return replacePlaceholders(projectTemplate, {
       name: () => project.name,
@@ -167,7 +175,8 @@ export class Main {
       image: () => project.image,
       volumes: () => this.getVolumes(project),
       labels: () => this.getLabels(project),
-      env: () => this.getEnv(project)
+      env: () => this.getEnv(project),
+      port: () => this.getPort(project)
     });
   }
 

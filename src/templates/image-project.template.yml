@@ -4,4 +4,5 @@
   image: %%image%%
   %%volumes%%
   %%env%%
+  %%port%%
 %%labels%%

@@ -98,7 +98,13 @@ export class Main {
       const from = path.resolve(process.cwd(), mainConfig.secretsPath, 'hosting', file.from);
 
       if (file.to) {
-        copyFileSync(from, path.join(`${this._outDir}`, file.to));
+        //ensure directory exists
+        const to = path.join(this._outDir, file.to);
+        const toDir = path.dirname(to);
+        if (!existsSync(toDir)) {
+          mkdirSync(toDir, { recursive: true });
+        }
+        copyFileSync(from, to);
       }
       if (file.appendToTraefikConfig) {
         const traefikCnfig = readFileSync(`${this._outDirTraefik}/traefik.toml`);

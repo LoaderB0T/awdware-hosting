@@ -136,7 +136,7 @@ export class Main {
     const labels = replacePlaceholders(traefikTemplate, {
       port: () => (project.port ? `- "traefik.port=${project.port}"` : ''),
       name: () => project.name,
-      host: () => project.host
+      host: () => (project.host!.split('.').length === 2 ? `\`${project.host}\`, \`www.${project.host}\`` : `\`${project.host}\``)
     });
     return `${indent('labels:', 1)}\n${indent(labels, 2)}`;
   }

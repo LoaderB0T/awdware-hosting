@@ -3,7 +3,7 @@
 - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 - "traefik.http.middlewares.redirect-to-non-www.redirectregex.regex=^https://www.(.*)"
-- "traefik.http.middlewares.redirect-to-non-www.redirectregex.replacement=https://$$$$$$1"
+- "traefik.http.middlewares.redirect-to-non-www.redirectregex.replacement=https://$$1"
 - "traefik.http.middlewares.redirect-to-non-www.redirectregex.permanent=true"
 - "traefik.http.routers.%%name%%.rule=Host(%%host%%)"
 - "traefik.http.routers.%%name%%.entrypoints=http"
